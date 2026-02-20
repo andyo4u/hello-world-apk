@@ -1,0 +1,36 @@
+workflows:
+  android-ios-workflow:
+    name: Android & iOS Workflow
+    max_build_duration: 60
+    environment:
+      flutter: stable
+      xcode: latest
+      cocoapods: default
+    scripts:
+      - name: Set up local.properties
+        script: |
+          echo "flutter.sdk=$HOME/programs/flutter" > "$CM_BUILD_DIR/android/local.properties"
+      - name: Get Flutter packages
+        script: |
+          flutter packages pub get
+      - name: Flutter analyze
+        script: |
+          flutter analyze
+      - name: Build Android APK
+        script: |
+          flutter build apk --release
+      - name: Build iOS (no code signing for now)
+        script: |
+          flutter build ios --release --no-codesign
+    artifacts:
+      - build/**/outputs/**/*.apk
+      - build/**/outputs/**/mapping.txt
+      - build/ios/iphoneos/*.app
+      - flutter_drive.log
+    publishing:
+      email:
+        recipients:
+          - obr.andy@yahoo.com
+        notify:
+          success: true
+          failure: true
